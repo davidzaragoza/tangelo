@@ -52,3 +52,28 @@ curl --location --request POST 'http://localhost:8080/api/v1/crop' --form 'image
 ```bash
 curl --location --request GET 'http://localhost:8080/api/v1/cropped/tangelo.png_0_0.jpg' --out croppedImage0_0.jpg
 ```
+
+# Execute locally
+In order to execute the application locally, docker must be previously installed on the machine. The image was tested in Docker Swarm mode, but probably docker-compose should work too.
+
+First, the docker image must be built using the following command:
+```bash
+docker build -t tangelo-renderer .
+```
+
+Now, enter to the deployments folder.
+```bash
+cd deployments
+```
+
+This example creates a docker service that execute a Postgres Database, if you want to use another Postgres Database, comment the service and volume postgres from services.yml file. Update the configuration.json file according to the database.
+
+Now deploy the stack:
+```bash
+docker stack deploy -c services.yml tangelo
+```
+
+Finally, check that the service is running:
+```bash
+docker service logs tangelo_renderer
+```

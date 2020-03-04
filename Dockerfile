@@ -5,5 +5,6 @@ RUN cd /src && go build -o tangelo cmd/main.go
 
 FROM alpine
 WORKDIR /app
+EXPOSE 8080
 COPY --from=builder /src/tangelo /app/
 ENTRYPOINT ./tangelo
