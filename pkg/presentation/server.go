@@ -41,7 +41,7 @@ func (s *Server) crop(c *gin.Context) {
 		return
 	}
 	log.Printf("retrieved image %s", header.Filename)
-	response, err := s.uc.CropImage(file)
+	response, err := s.uc.CropImage(header.Filename, file)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -1,9 +1,9 @@
 package domain
 
 import (
+	"bytes"
 	"fmt"
 	"image"
-	"os"
 
 	// Allow these image formats
 	"image/draw"
@@ -16,23 +16,26 @@ import (
 )
 
 const (
+	croppedBaseURL   = "http://localhost:8080/api/v1/cropped"
 	verticalSplits   = 3
 	horizontalSplits = 5
 )
 
 type UseCase struct {
+	rep Repository
 }
 
-func NewUseCase() *UseCase {
-	return &UseCase{}
+func NewUseCase(rep Repository) *UseCase {
+	return &UseCase{rep: rep}
 }
 
-func (uc *UseCase) CropImage(original multipart.File) ([]string, error) {
+func (uc *UseCase) CropImage(name string, original multipart.File) ([]string, error) {
 	log.Print("cropping the image")
 	img, _, err := image.Decode(original)
 	if err != nil {
 		return nil, err
 	}
+	result := []string{}
 
 	croppedWidth := img.Bounds().Dx() / verticalSplits
 	croppedHeight := img.Bounds().Dy() / horizontalSplits
@@ -42,24 +45,27 @@ func (uc *UseCase) CropImage(original multipart.File) ([]string, error) {
 			rectangle := image.Rectangle{image.Point{0, 0}, image.Point{croppedWidth, croppedHeight}}
 			rgba := image.NewRGBA(rectangle)
 			draw.Draw(rgba, rectangle.Bounds(), img, image.Point{j * croppedWidth, i * croppedHeight}, draw.Src)
-			if err := uc.saveImage(fmt.Sprintf("out_%d_%d.jpg", i, j), rgba); err != nil {
+			bytes, err := uc.getImageBytes(rgba)
+			if err != nil {
 				return nil, err
 			}
+			croppedName := fmt.Sprintf("%s/%s_%d_%d.jpg", croppedBaseURL, name, i, j)
+			if err := uc.rep.SaveImage(croppedName, bytes); err != nil {
+				return nil, err
+			}
+			result = append(result, croppedName)
 		}
 	}
-	return nil, nil
+	return result, nil
 }
 
-func (uc *UseCase) saveImage(name string, rgba *image.RGBA) error {
-	out, err := os.Create(name)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
+func (uc *UseCase) getImageBytes(rgba *image.RGBA) ([]byte, error) {
 	var opt jpeg.Options
 	opt.Quality = 100
 
-	jpeg.Encode(out, rgba, &opt)
-	return nil
+	var result bytes.Buffer
+	if err := jpeg.Encode(&result, rgba, &opt); err != nil {
+		return nil, err
+	}
+	return result.Bytes(), nil
 }
