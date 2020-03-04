@@ -22,6 +22,13 @@ type DatabaseConfiguration struct {
 	Schema   string `json:"schema"`
 }
 
+type SSLConfiguration struct {
+	Enabled  bool   `json:"enabled"`
+	CertFile string `json:"certFile"`
+	KeyFile  string `json:"keyFile"`
+}
+
 type Configuration struct {
 	Database DatabaseConfiguration `json:"database"`
+	SSL      SSLConfiguration      `json:"ssl"`
 }

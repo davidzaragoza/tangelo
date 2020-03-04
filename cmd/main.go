@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 	uc := domain.NewUseCase(rep)
-	server := presentation.NewServer(uc)
+	server := presentation.NewServer(config, uc)
 	server.StartServer()
 }
 

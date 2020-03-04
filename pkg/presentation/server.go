@@ -9,11 +9,12 @@ import (
 )
 
 type Server struct {
-	uc *domain.UseCase
+	config *domain.Configuration
+	uc     *domain.UseCase
 }
 
-func NewServer(uc *domain.UseCase) *Server {
-	return &Server{uc: uc}
+func NewServer(config *domain.Configuration, uc *domain.UseCase) *Server {
+	return &Server{config: config, uc: uc}
 }
 
 func (s *Server) StartServer() {
@@ -32,7 +33,11 @@ func (s *Server) StartServer() {
 	}
 
 	log.Println("starting server at :8080")
-	log.Fatal(router.Run(":8080"))
+	if s.config.SSL.Enabled {
+		router.RunTLS(":8080", s.config.SSL.CertFile, s.config.SSL.KeyFile)
+	} else {
+		log.Fatal(router.Run(":8080"))
+	}
 }
 
 func (s *Server) crop(c *gin.Context) {
