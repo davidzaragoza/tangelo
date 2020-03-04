@@ -2,18 +2,21 @@ package presentation
 
 import (
 	"log"
+	"net/http"
 
+	"github.com/davidzaragoza/tangelo/pkg/domain"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
+	uc *domain.UseCase
 }
 
-func NewServer() *Server {
-	return &Server{}
+func NewServer(uc *domain.UseCase) *Server {
+	return &Server{uc: uc}
 }
 
-func (p *Server) StartServer() {
+func (s *Server) StartServer() {
 	router := gin.Default()
 	v1 := router.Group("/api/v1")
 	{
@@ -22,8 +25,26 @@ func (p *Server) StartServer() {
 				"status": "OK",
 			})
 		})
+
+		v1.POST("/crop", s.crop)
+
 	}
 
 	log.Println("starting server at :8080")
 	log.Fatal(router.Run(":8080"))
+}
+
+func (s *Server) crop(c *gin.Context) {
+	file, header, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Printf("retrieved image %s", header.Filename)
+	response, err := s.uc.CropImage(file)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
