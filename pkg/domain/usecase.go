@@ -50,6 +50,7 @@ func (uc *UseCase) CropImage(name string, original multipart.File) ([]string, er
 				return nil, err
 			}
 			croppedName := fmt.Sprintf("%s/%s_%d_%d.jpg", croppedBaseURL, name, i, j)
+			// uc.saveToDisk(fmt.Sprintf("%s_%d_%d.jpg", name, i, j), rgba)
 			if err := uc.rep.SaveImage(croppedName, bytes); err != nil {
 				return nil, err
 			}
@@ -58,6 +59,21 @@ func (uc *UseCase) CropImage(name string, original multipart.File) ([]string, er
 	}
 	return result, nil
 }
+
+// func (uc *UseCase) saveToDisk(name string, rgba *image.RGBA) error {
+// 	f, err := os.Create(name)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer f.Close()
+// 	var opt jpeg.Options
+// 	opt.Quality = 100
+
+// 	if err := jpeg.Encode(f, rgba, &opt); err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
 func (uc *UseCase) getImageBytes(rgba *image.RGBA) ([]byte, error) {
 	var opt jpeg.Options
@@ -68,4 +84,10 @@ func (uc *UseCase) getImageBytes(rgba *image.RGBA) ([]byte, error) {
 		return nil, err
 	}
 	return result.Bytes(), nil
+}
+
+func (uc *UseCase) GetImage(name string) ([]byte, error) {
+	log.Printf("Obtaining image %s", name)
+	croppedName := fmt.Sprintf("%s/%s", croppedBaseURL, name)
+	return uc.rep.GetImage(croppedName)
 }

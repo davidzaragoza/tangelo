@@ -27,6 +27,7 @@ func (s *Server) StartServer() {
 		})
 
 		v1.POST("/crop", s.crop)
+		v1.GET("/cropped/:name", s.getCroppedImage)
 
 	}
 
@@ -47,4 +48,14 @@ func (s *Server) crop(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func (s *Server) getCroppedImage(c *gin.Context) {
+	name := c.Param("name")
+	result, err := s.uc.GetImage(name)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.Data(http.StatusOK, "image/jpeg", result)
 }

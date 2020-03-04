@@ -47,11 +47,11 @@ func (rep *Repository) SaveImage(url string, content []byte) error {
 		if postgreErr, ok := err.(*pq.Error); ok {
 			// This error happens when primary key exist
 			if postgreErr.Code == "23505" {
-				stmtUpdate, err := rep.db.Prepare("UPDATE images SET content = $1")
+				stmtUpdate, err := rep.db.Prepare("UPDATE images SET content = $2 WHERE url = $1")
 				if err != nil {
 					return err
 				}
-				if _, err := stmtUpdate.Exec(content); err != nil {
+				if _, err := stmtUpdate.Exec(url, content); err != nil {
 					return err
 				}
 				return nil
@@ -63,5 +63,14 @@ func (rep *Repository) SaveImage(url string, content []byte) error {
 }
 
 func (rep *Repository) GetImage(url string) ([]byte, error) {
-	return nil, nil
+	stmt, err := rep.db.Prepare("SELECT content FROM images WHERE url = $1")
+	if err != nil {
+		return nil, err
+	}
+	result := []byte{}
+	err = stmt.QueryRow(url).Scan(&result)
+	if err != nil {
+		return nil, err
+	}
+	return result, err
 }
