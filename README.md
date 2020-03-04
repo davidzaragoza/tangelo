@@ -20,12 +20,12 @@ The api have the following endpoints:
 
     Response:
     ```json
-        [
-            "http://example.tangelo/api/cropped/part0_0.jpg",
-            "http://example.tangelo/api/cropped/part0_1.jpg",
-            "http://example.tangelo/api/cropped/part1_0.jpg",
-            "http://example.tangelo/api/cropped/part1_1.jpg",
-        ]
+    [
+        "http://localhost:8080/api/v1/cropped/tangelo.png_0_0.jpg",
+        "http://localhost:8080/api/v1/cropped/tangelo.png_0_1.jpg",
+        "http://localhost:8080/api/v1/cropped/tangelo.png_1_0.jpg",
+        "http://localhost:8080/api/v1/cropped/tangelo.png_1_1.jpg"
+    ]
     ```
 
 - Get Cropped Image
