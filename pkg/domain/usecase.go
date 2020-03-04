@@ -17,8 +17,8 @@ import (
 
 const (
 	croppedBaseURL   = "http://localhost:8080/api/v1/cropped"
-	verticalSplits   = 3
-	horizontalSplits = 5
+	verticalSplits   = 2
+	horizontalSplits = 2
 )
 
 type UseCase struct {

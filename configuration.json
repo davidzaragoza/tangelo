@@ -1,0 +1,11 @@
+{
+    "database": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "postgres",
+        "schema": "tangelo",
+        "user": "admin",
+        "password": "password",
+        "ssl": "disable"
+    }
+}
